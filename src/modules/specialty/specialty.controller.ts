@@ -37,6 +37,20 @@ class SpecialtyController {
       HttpStatus.OK,
     );
   });
+
+  public updateSpecialty = catchAsync(async (req: Request, res: Response) => {
+    const service = new SpecialtyService();
+    const result = await service.updateSpecialty(
+      req.params.id as string,
+      req.body,
+    );
+    return ResponseUtil.success(
+      res,
+      result,
+      "Specialty updated successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default SpecialtyController;

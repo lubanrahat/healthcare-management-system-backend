@@ -21,6 +21,18 @@ class SpecialtyService {
     });
     return specialty;
   };
+  public updateSpecialty = async (
+    id: string,
+    payload: CreateSpecialtyInput,
+  ) => {
+    const specialty = await prisma.specialty.update({
+      where: {
+        id,
+      },
+      data: payload,
+    });
+    return specialty;
+  };
 }
 
 export default SpecialtyService;
