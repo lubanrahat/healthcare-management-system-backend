@@ -1,11 +1,10 @@
 import { Router } from "express";
+import registerHealthRoutes from "../modules/health/health.routes";
 
 export function registerIndexRoutes(): Router {
   const router = Router();
 
-  router.get("/", (req, res) => {
-    res.json({ message: "Hello World!" });
-  });
+  router.use("/health", registerHealthRoutes());
 
   return router;
 }

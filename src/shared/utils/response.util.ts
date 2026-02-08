@@ -1,12 +1,13 @@
 import type { Response } from "express";
 import type { ApiResponse } from "../types/response.types";
+import HttpStatus from "../constants/http-status";
 
 export class ResponseUtil {
   static success<T>(
     res: Response,
     data: T,
     message?: string,
-    statusCode = 200,
+    statusCode = HttpStatus.OK,
   ) {
     const response: ApiResponse<T> = {
       success: true,
@@ -22,7 +23,7 @@ export class ResponseUtil {
   static error(
     res: Response,
     message: string,
-    statusCode = 500,
+    statusCode = HttpStatus.INTERNAL_SERVER_ERROR,
     errorCode?: string,
     details?: any,
   ) {
@@ -62,6 +63,6 @@ export class ResponseUtil {
         },
       },
     };
-    return res.status(200).json(response);
+    return res.status(HttpStatus.OK).json(response);
   }
 }
