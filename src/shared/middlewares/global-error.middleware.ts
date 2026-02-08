@@ -2,10 +2,10 @@ import type { Request, Response, NextFunction } from "express";
 import AppError from "../errors/app-error";
 import { ResponseUtil } from "../utils/response.util";
 import { ZodError } from "zod";
-import { Prisma } from "../../generated/prisma/client";
 import { PrismaErrorHandler } from "../utils/prisma-error-handler";
 import HttpStatus from "../constants/http-status";
 import ErrorCodes from "../errors/error-codes";
+import { Prisma } from "../../generated/prisma/client/client";
 
 export const errorHandler = (
   err: unknown,

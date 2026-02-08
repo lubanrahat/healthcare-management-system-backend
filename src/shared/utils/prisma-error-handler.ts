@@ -1,4 +1,5 @@
-import { Prisma } from "../../generated/prisma/client";
+
+import { Prisma } from "../../generated/prisma/client/client";
 import HttpStatus from "../constants/http-status";
 import ErrorCodes from "../errors/error-codes";
 
