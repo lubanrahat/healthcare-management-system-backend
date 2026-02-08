@@ -9,10 +9,21 @@ class SpecialtyService {
 
     return specialty;
   };
+
   public getAllSpecialties = async () => {
     const specialties = await prisma.specialty.findMany();
     return specialties;
   };
+
+  public getSpecialty = async (id: string) => {
+    const specialty = await prisma.specialty.findUnique({
+      where: {
+        id,
+      },
+    });
+    return specialty;
+  };
+  
   public deleteSpecialty = async (id: string) => {
     const specialty = await prisma.specialty.delete({
       where: {
@@ -21,6 +32,7 @@ class SpecialtyService {
     });
     return specialty;
   };
+
   public updateSpecialty = async (
     id: string,
     payload: CreateSpecialtyInput,

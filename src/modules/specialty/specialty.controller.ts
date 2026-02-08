@@ -27,6 +27,17 @@ class SpecialtyController {
     );
   });
 
+  public getSpecialty = catchAsync(async (req: Request, res: Response) => {
+    const service = new SpecialtyService();
+    const result = await service.getSpecialty(req.params.id as string);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Specialty fetched successfully",
+      HttpStatus.OK,
+    );
+  });
+
   public deleteSpecialty = catchAsync(async (req: Request, res: Response) => {
     const service = new SpecialtyService();
     const result = await service.deleteSpecialty(req.params.id as string);
