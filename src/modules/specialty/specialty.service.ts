@@ -9,6 +9,10 @@ class SpecialtyService {
 
     return specialty;
   };
+  public getAllSpecialties = async () => {
+    const specialties = await prisma.specialty.findMany();
+    return specialties;
+  };
 }
 
 export default SpecialtyService;

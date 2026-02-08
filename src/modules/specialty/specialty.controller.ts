@@ -15,6 +15,17 @@ class SpecialtyController {
       HttpStatus.CREATED,
     );
   });
+
+  public getAllSpecialties = catchAsync(async (req: Request, res: Response) => {
+    const service = new SpecialtyService();
+    const result = await service.getAllSpecialties();
+    return ResponseUtil.success(
+      res,
+      result,
+      "Specialties fetched successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default SpecialtyController;

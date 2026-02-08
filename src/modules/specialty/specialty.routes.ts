@@ -6,6 +6,7 @@ export default function registerSpecialtyRoutes(): Router {
   const controller = new SpecialtyController();
 
   router.post("/", controller.createSpecialty.bind(controller));
+  router.get("/", controller.getAllSpecialties.bind(controller));
 
   return router;
 }
