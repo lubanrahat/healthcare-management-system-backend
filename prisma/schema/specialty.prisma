@@ -9,7 +9,7 @@ model Specialty {
   updatedAt DateTime @updatedAt
 
   isDeleted Boolean @default(false)
-  deletedAt DateTime
+  deletedAt DateTime?
 
   @@index([isDeleted], name: "specialty_is_deleted_idx")
   @@index([title], name: "specialty_title_idx")
