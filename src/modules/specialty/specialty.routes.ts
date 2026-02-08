@@ -7,6 +7,7 @@ export default function registerSpecialtyRoutes(): Router {
 
   router.post("/", controller.createSpecialty.bind(controller));
   router.get("/", controller.getAllSpecialties.bind(controller));
+  router.delete("/:id", controller.deleteSpecialty.bind(controller));
 
   return router;
 }

@@ -13,6 +13,14 @@ class SpecialtyService {
     const specialties = await prisma.specialty.findMany();
     return specialties;
   };
+  public deleteSpecialty = async (id: string) => {
+    const specialty = await prisma.specialty.delete({
+      where: {
+        id,
+      },
+    });
+    return specialty;
+  };
 }
 
 export default SpecialtyService;
