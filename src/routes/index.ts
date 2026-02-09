@@ -10,7 +10,7 @@ export function registerIndexRoutes(): Router {
   router.use("/health", registerHealthRoutes());
   router.use("/auth", registerAuthRoutes());
   router.use("/specialty", registerSpecialtyRoutes());
-  router.use("/doctors", registerDoctorRoutes());
+  router.use("/users", registerDoctorRoutes());
 
   return router;
 }
