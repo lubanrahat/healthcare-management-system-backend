@@ -10,7 +10,27 @@ model Specialty {
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
+  doctorsSpecialty DoctorSpecialty[]
+
   @@index([isDeleted], name: "specialty_is_deleted_idx")
   @@index([title], name: "specialty_title_idx")
   @@map("specialty")
+}
+
+model DoctorSpecialty {
+  id String @id @default(uuid(7))
+
+  doctorId    String
+  specialtyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  specialty Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([doctorId, specialtyId])
+  @@index([specialtyId], name: "doctor_specialty_specialty_id_idx")
+  @@map("doctor_specialty")
 }
