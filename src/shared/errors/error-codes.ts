@@ -25,6 +25,7 @@ export enum ErrorCodes {
   // Other
   NOT_FOUND = 'NOT_FOUND',
   FOREIGN_KEY_CONSTRAINT = 'FOREIGN_KEY_CONSTRAINT',
+  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
 
 export default ErrorCodes;
