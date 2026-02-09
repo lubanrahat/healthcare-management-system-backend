@@ -6,6 +6,7 @@ import { PrismaErrorHandler } from "../utils/prisma-error-handler";
 import HttpStatus from "../constants/http-status";
 import ErrorCodes from "../errors/error-codes";
 import { Prisma } from "../../generated/prisma/client/client";
+import { logger } from "../logger/logger";
 
 export const errorHandler = (
   err: unknown,
@@ -58,15 +59,25 @@ export const errorHandler = (
 
   // Handle JWT errors
   if (err instanceof Error && err.name === "JsonWebTokenError") {
-    return ResponseUtil.error(res, "Invalid token", HttpStatus.UNAUTHORIZED, ErrorCodes.INVALID_TOKEN);
+    return ResponseUtil.error(
+      res,
+      "Invalid token",
+      HttpStatus.UNAUTHORIZED,
+      ErrorCodes.INVALID_TOKEN,
+    );
   }
 
   if (err instanceof Error && err.name === "TokenExpiredError") {
-    return ResponseUtil.error(res, "Token expired", HttpStatus.UNAUTHORIZED, ErrorCodes.TOKEN_EXPIRED);
+    return ResponseUtil.error(
+      res,
+      "Token expired",
+      HttpStatus.UNAUTHORIZED,
+      ErrorCodes.TOKEN_EXPIRED,
+    );
   }
 
   // Log unexpected errors
-  console.error("Unhandled error:", err);
+  logger.error("Unhandled error:", err);
 
   // Default fallback
   const message =
@@ -76,5 +87,10 @@ export const errorHandler = (
         ? err.message
         : "Unknown error";
 
-  return ResponseUtil.error(res, message, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCodes.INTERNAL_ERROR);
+  return ResponseUtil.error(
+    res,
+    message,
+    HttpStatus.INTERNAL_SERVER_ERROR,
+    ErrorCodes.INTERNAL_ERROR,
+  );
 };

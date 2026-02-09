@@ -4,17 +4,22 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
-  PORT: z.string(),
+
+  PORT: z.coerce.number().default(8080),
 });
 
-function createEnv(env: NodeJS.ProcessEnv) {
-  const validationResult = envSchema.safeParse(env);
+export type Env = z.infer<typeof envSchema>;
 
-  if (validationResult.success) {
-    return validationResult.data;
-  } else {
-    throw new Error(validationResult.error.message);
+function createEnv(env: NodeJS.ProcessEnv): Env {
+  const result = envSchema.safeParse(env);
+
+  if (!result.success) {
+    console.error("❌ Invalid environment variables:");
+    console.error(result.error.format());
+    process.exit(1); 
   }
+
+  return result.data;
 }
 
 export const env = createEnv(process.env);
