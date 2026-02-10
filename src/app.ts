@@ -17,6 +17,10 @@ function createApp(): Application {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // Request processing middlewares should come before routes
+  app.use(requestIdMiddleware);
+  app.use(requestLogger);
+
   app.use("/api/v1", IndexRouter);
 
   app.use((req: Request, res: Response) => {
@@ -25,8 +29,6 @@ function createApp(): Application {
   });
 
   app.use(errorHandler);
-  app.use(requestIdMiddleware);
-  app.use(requestLogger);
 
   return app;
 }

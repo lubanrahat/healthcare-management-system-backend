@@ -1,9 +1,8 @@
 import winston from "winston";
-import { env } from "../../config/env";
 
 const { combine, timestamp, errors, printf, json, colorize } = winston.format;
 
-const isProduction = env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production";
 
 const logFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
   return `${timestamp} [${level}]: ${stack || message} ${

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logger } from "../shared/logger/logger";
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -6,6 +7,12 @@ const envSchema = z.object({
     .default("development"),
 
   PORT: z.coerce.number().default(8080),
+  ACCESS_TOKEN_SECRET: z.string(),
+  REFRESH_TOKEN_SECRET: z.string(),
+  ACCESS_TOKEN_EXPIRATION: z.string(),
+  REFRESH_TOKEN_EXPIRATION: z.string(),
+  BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: z.string(),
+  BETTER_AUTH_SESSION_TOKEN_EXPIRATION: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -14,9 +21,10 @@ function createEnv(env: NodeJS.ProcessEnv): Env {
   const result = envSchema.safeParse(env);
 
   if (!result.success) {
-    console.error("❌ Invalid environment variables:");
-    console.error(result.error.format());
-    process.exit(1); 
+    logger.error("Environment variable validation failed", {
+      errors: result.error.format(),
+    });
+    process.exit(1);
   }
 
   return result.data;

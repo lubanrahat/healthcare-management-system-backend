@@ -1,4 +1,3 @@
-import { th } from "zod/locales";
 import { UserStatus } from "../../generated/prisma/client/enums";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
@@ -6,10 +5,11 @@ import HttpStatus from "../../shared/constants/http-status";
 import AppError from "../../shared/errors/app-error";
 import ErrorCodes from "../../shared/errors/error-codes";
 import { logger } from "../../shared/logger/logger";
-import type { CreateUserInput, LoginInput } from "./auth.validation";
+import TokenService from "../../shared/utils/token";
+import type { ILoginPayload, IRegisterPatientPayload } from "./auth.interface";
 
 class AuthService {
-  public registerPatient = async (payload: CreateUserInput) => {
+  public registerPatient = async (payload: IRegisterPatientPayload) => {
     const { name, email, password } = payload;
     const data = await auth.api.signUpEmail({
       body: {
@@ -36,9 +36,31 @@ class AuthService {
         },
       });
 
+      const accessToken = TokenService.generateAccessToken({
+      userId: data.user.id,
+      role: data.user.role,
+      name: data.user.name,
+      email: data.user.email,
+      status: data.user.status,
+      isDeleted: data.user.isDeleted,
+      emailVerified: data.user.emailVerified,
+    });
+
+    const refreshToken = TokenService.generateRefreshToken({
+      userId: data.user.id,
+      role: data.user.role,
+      name: data.user.name,
+      email: data.user.email,
+      status: data.user.status,
+      isDeleted: data.user.isDeleted,
+      emailVerified: data.user.emailVerified,
+    });
+
       return {
         ...data,
         patient,
+        accessToken,
+        refreshToken
       };
     } catch (error) {
       logger.error("Failed to create patient", error);
@@ -54,7 +76,8 @@ class AuthService {
       );
     }
   };
-  public login = async (payload: LoginInput) => {
+
+  public login = async (payload: ILoginPayload) => {
     const { email, password } = payload;
     const data = await auth.api.signInEmail({
       body: {
@@ -77,7 +100,31 @@ class AuthService {
       );
     }
 
-    return data;
+    const accessToken = TokenService.generateAccessToken({
+      userId: data.user.id,
+      role: data.user.role,
+      name: data.user.name,
+      email: data.user.email,
+      status: data.user.status,
+      isDeleted: data.user.isDeleted,
+      emailVerified: data.user.emailVerified,
+    });
+
+    const refreshToken = TokenService.generateRefreshToken({
+      userId: data.user.id,
+      role: data.user.role,
+      name: data.user.name,
+      email: data.user.email,
+      status: data.user.status,
+      isDeleted: data.user.isDeleted,
+      emailVerified: data.user.emailVerified,
+    });
+
+    return {
+      ...data,
+      accessToken,
+      refreshToken,
+    };
   };
 }
 
