@@ -3,7 +3,7 @@ import UserController from "./user.controller";
 
 
 
-export default function registerDoctorRoutes(): Router {
+export default function registerUsersRoutes(): Router {
     const router = express.Router();
     const controller = new UserController();
 

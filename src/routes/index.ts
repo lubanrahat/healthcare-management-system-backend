@@ -2,7 +2,8 @@ import { Router } from "express";
 import registerHealthRoutes from "../modules/health/health.routes";
 import registerAuthRoutes from "../modules/auth/auth.routes";
 import registerSpecialtyRoutes from "../modules/specialty/specialty.routes";
-import registerDoctorRoutes from "../modules/user/user.routes";
+import registerUsersRoutes from "../modules/user/user.routes";
+import registerDoctorRoutes from "../modules/doctor/doctor.routes";
 
 export function registerIndexRoutes(): Router {
   const router = Router();
@@ -10,7 +11,8 @@ export function registerIndexRoutes(): Router {
   router.use("/health", registerHealthRoutes());
   router.use("/auth", registerAuthRoutes());
   router.use("/specialty", registerSpecialtyRoutes());
-  router.use("/users", registerDoctorRoutes());
+  router.use("/users", registerUsersRoutes());
+  router.use("/doctors", registerDoctorRoutes());
 
   return router;
 }
