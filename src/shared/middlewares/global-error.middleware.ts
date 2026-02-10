@@ -28,15 +28,15 @@ export const errorHandler = (
   // Handle Zod validation errors
   if (err instanceof ZodError) {
     const formattedErrors = err.issues.map((issue) => ({
-      field: issue.path.join("."),
+      field: issue.path.length ? issue.path.join(".") : "_root",
       message: issue.message,
     }));
 
     return ResponseUtil.error(
       res,
       "Validation failed",
-      400,
-      "VALIDATION_ERROR",
+      HttpStatus.BAD_REQUEST,
+      ErrorCodes.VALIDATION_ERROR,
       formattedErrors,
     );
   }
