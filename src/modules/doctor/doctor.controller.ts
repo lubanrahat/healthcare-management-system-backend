@@ -26,6 +26,28 @@ class DoctorController {
         HttpStatus.OK,
       );
     })
+
+    public updateDoctor = catchAsync(async (req: Request, res: Response) => {
+      const service = new DoctorService();
+      const result = await service.updateDoctor(req.params.id as string, req.body);
+      return ResponseUtil.success(
+        res,
+        result,
+        "Doctor updated successfully",
+        HttpStatus.OK,
+      );
+    })
+
+    public deleteDoctor = catchAsync(async (req: Request, res: Response) => {
+      const service = new DoctorService();
+      const result = await service.deleteDoctor(req.params.id as string);
+      return ResponseUtil.success(
+        res,
+        result,
+        "Doctor deleted successfully",
+        HttpStatus.OK,
+      );
+    })
 }
 
 export default DoctorController;
