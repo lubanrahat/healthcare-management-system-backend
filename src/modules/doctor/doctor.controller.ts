@@ -15,6 +15,17 @@ class DoctorController {
         HttpStatus.OK,
       );
     })
+
+    public getDoctorById = catchAsync(async (req: Request, res: Response) => {
+      const service = new DoctorService();
+      const result = await service.getDoctorById(req.params.id as string);
+      return ResponseUtil.success(
+        res,
+        result,
+        "Doctor fetched successfully",
+        HttpStatus.OK,
+      );
+    })
 }
 
 export default DoctorController;
