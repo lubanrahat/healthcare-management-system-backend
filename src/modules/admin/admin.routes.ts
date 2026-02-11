@@ -1,9 +1,9 @@
 import express, { type Router } from "express";
 import AdminController from "./admin.controller";
-import { withAuth } from "../../shared/middlewares/auth.middleware";
 import { UserRole } from "../../generated/prisma/client/enums";
 import { validateRequest } from "../../shared/middlewares/validate.middleware";
 import { updateAdminZodSchema } from "./admin.validation";
+import { withAuth } from "../../shared/middlewares/auth.middleware";
 
 export default function registerAdminRoutes(): Router {
   const router = express.Router();
