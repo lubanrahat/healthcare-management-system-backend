@@ -1,6 +1,9 @@
 import { UserRole } from "../../generated/prisma/client/enums";
 import type { Specialty } from "../../generated/prisma/client/client";
-import type { ICreateDoctorPayload } from "./user.interface";
+import type {
+  ICreateAdminPayload,
+  ICreateDoctorPayload,
+} from "./user.interface";
 import { prisma } from "../../lib/prisma";
 import HttpStatus from "../../shared/constants/http-status";
 import AppError from "../../shared/errors/app-error";
@@ -134,6 +137,51 @@ class UserService {
         "Failed to create doctor",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  };
+
+  public createAdmin = async (payload: ICreateAdminPayload) => {
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: payload.admin.email,
+      },
+    });
+
+    if (userExists) {
+      throw new AppError(
+        "User with this email already exists",
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    const { admin, role, password } = payload;
+
+    const userData = await auth.api.signUpEmail({
+      body: {
+        ...admin,
+        password,
+        role,
+        needPasswordChange: true,
+      },
+    });
+
+    try {
+      const adminData = await prisma.admin.create({
+        data: {
+          userId: userData.user.id,
+          ...admin,
+        },
+      });
+
+      return adminData;
+    } catch (error: any) {
+      console.log("Error creating admin: ", error);
+      await prisma.user.delete({
+        where: {
+          id: userData.user.id,
+        },
+      });
+      throw error;
     }
   };
 }

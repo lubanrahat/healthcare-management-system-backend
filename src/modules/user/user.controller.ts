@@ -15,6 +15,17 @@ class UserController {
       HttpStatus.CREATED,
     );
   });
+
+  public createAdmin = catchAsync(async (req: Request, res: Response) => {
+    const service = new userService();
+    const result = await service.createAdmin(req.body);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Admin created successfully",
+      HttpStatus.CREATED,
+    );
+  });
 }
 
 export default UserController;

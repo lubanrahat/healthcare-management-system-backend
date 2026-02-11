@@ -4,6 +4,7 @@ import registerAuthRoutes from "../modules/auth/auth.routes";
 import registerSpecialtyRoutes from "../modules/specialty/specialty.routes";
 import registerUsersRoutes from "../modules/user/user.routes";
 import registerDoctorRoutes from "../modules/doctor/doctor.routes";
+import registerAdminRoutes from "../modules/admin/admin.routes";
 
 export function registerIndexRoutes(): Router {
   const router = Router();
@@ -13,6 +14,7 @@ export function registerIndexRoutes(): Router {
   router.use("/specialty", registerSpecialtyRoutes());
   router.use("/users", registerUsersRoutes());
   router.use("/doctors", registerDoctorRoutes());
+  router.use("/admins", registerAdminRoutes());
 
   return router;
 }
