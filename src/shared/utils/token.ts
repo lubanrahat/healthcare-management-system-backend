@@ -15,6 +15,36 @@ class TokenService {
       expiresIn: env.REFRESH_TOKEN_EXPIRATION,
     } as SignOptions);
   }
+
+  static setAccessToken(res: Response, token: string): void {
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 1000, // 1 day
+    });
+  }
+
+  static setRefreshToken(res: Response, token: string): void {
+    res.cookie("refreshToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 1000 * 7, // 7 day
+    });
+  }
+
+  static setBetterAuthSessionCookie(res: Response, token: string): void {
+    res.cookie("better-auth.session_token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 1000, // 1 day
+    });
+  }
 }
 
 export default TokenService;

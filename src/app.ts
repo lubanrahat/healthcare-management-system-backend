@@ -4,6 +4,7 @@ import express, {
   type Response,
 } from "express";
 import { IndexRouter } from "./routes";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./shared/middlewares/global-error.middleware";
 import { ResponseUtil } from "./shared/utils/response.util";
 import HttpStatus from "./shared/constants/http-status";
@@ -16,6 +17,7 @@ function createApp(): Application {
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
   // Request processing middlewares should come before routes
   app.use(requestIdMiddleware);
