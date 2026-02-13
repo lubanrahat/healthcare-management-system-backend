@@ -336,6 +336,17 @@ class AuthService {
       },
     });
 
+    if (exgistingUser.needPasswordChange) {
+      await prisma.user.update({
+        where: {
+          email,
+        },
+        data: {
+          needPasswordChange: false,
+        },
+      });
+    }
+
     await prisma.session.deleteMany({
       where: {
         userId: exgistingUser.id,
