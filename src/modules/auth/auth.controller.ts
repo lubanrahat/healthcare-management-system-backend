@@ -7,6 +7,7 @@ import { logger } from "../../shared/logger/logger";
 import ms, { type StringValue } from "ms";
 import { env } from "../../config/env";
 import TokenService from "../../shared/utils/token";
+import { CookieService } from "../../shared/utils/cookie";
 
 class AuthController {
   public registerPatient = catchAsync(async (req: Request, res: Response) => {
@@ -87,6 +88,21 @@ class AuthController {
       res,
       result,
       "Password changed successfully",
+      HttpStatus.OK,
+    );
+  });
+
+  public logoutUser = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+    const result = await service.logoutUser(betterAuthSessionToken);
+    CookieService.clear(res, "better-auth.session_token");
+    CookieService.clear(res, "refreshToken");
+    CookieService.clear(res, "accessToken");
+    return ResponseUtil.success(
+      res,
+      result,
+      "User logged out successfully",
       HttpStatus.OK,
     );
   });

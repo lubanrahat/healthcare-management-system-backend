@@ -217,6 +217,15 @@ class AuthService {
       throw error;
     }
   };
+
+  public logoutUser = async (sessionToken: string) => {
+    const result = await auth.api.signOut({
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        }
+      });
+      return result;
+  };
 }
 
 export default AuthService;

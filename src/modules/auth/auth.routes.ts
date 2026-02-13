@@ -32,5 +32,16 @@ export default function registerAuthRoutes(): Router {
     controller.changePassword.bind(controller),
   );
 
+  router.get(
+    "/logout",
+    withAuth(
+      UserRole.ADMIN,
+      UserRole.DOCTOR,
+      UserRole.PATIENT,
+      UserRole.SUPER_ADMIN,
+    ),
+    controller.logoutUser.bind(controller),
+  );
+
   return router;
 }

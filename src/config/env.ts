@@ -13,6 +13,12 @@ const envSchema = z.object({
   REFRESH_TOKEN_EXPIRATION: z.string(),
   BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: z.string(),
   BETTER_AUTH_SESSION_TOKEN_EXPIRATION: z.string(),
+  MAILTRAP_HOST: z.string(),
+  MAILTRAP_PORT: z.coerce.number(),
+  MAILTRAP_USER: z.string(),
+  MAILTRAP_PASS: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
