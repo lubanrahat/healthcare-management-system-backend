@@ -39,6 +39,57 @@ class AuthController {
     logger.info(`User logged in successfully: ${result.user?.email}`);
     return ResponseUtil.success(res, result, "Login successful", HttpStatus.OK);
   });
+
+  public getMe = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const result = await service.getMe(req.user.userId);
+    return ResponseUtil.success(
+      res,
+      result,
+      "User fetched successfully",
+      HttpStatus.OK,
+    );
+  });
+
+  public getNewToken = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+
+    const refreshToken = req.cookies.refreshToken;
+    const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+    if (!refreshToken) {
+      return ResponseUtil.error(
+        res,
+        "Refresh token not found",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const result = await service.getNewToken(
+      refreshToken,
+      betterAuthSessionToken,
+    );
+    const { accessToken, refreshToken: newRefreshToken, sessionToken } = result;
+
+    TokenService.setAccessToken(res, accessToken);
+    TokenService.setRefreshToken(res, newRefreshToken);
+    TokenService.setBetterAuthSessionCookie(res, sessionToken);
+
+    return ResponseUtil.success(res, result, "Login successful", HttpStatus.OK);
+  });
+
+  public changePassword = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+    const payload = req.body;
+    logger.info(betterAuthSessionToken, payload);
+    const result = await service.changePassword(payload, req.headers);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Password changed successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default AuthController;

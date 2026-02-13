@@ -78,15 +78,8 @@ export const withAuth =
             role: user.role,
             email: user.email,
           };
-        }
 
-        const accessToken = CookieService.get(req, "accessToken");
-
-        if (!accessToken) {
-          throw new AppError(
-            "Unauthorized access! No access token provided.",
-            HttpStatus.UNAUTHORIZED,
-          );
+          return next();
         }
       }
 
