@@ -107,8 +107,39 @@ const otpVerificationMailgenContent = (
   };
 };
 
+const forgotPasswordOtpMailgenContent = (
+  username: string,
+  otp: string,
+): MailgenContent => {
+  return {
+    body: {
+      name: username,
+
+      intro: [
+        "We received a request to reset your password.",
+        "Use the One-Time Password (OTP) below to continue:",
+        `🔐 ${otp}`,
+      ],
+
+      action: {
+        instructions:
+          "Enter this OTP on the password reset page. This OTP will expire in 5 minutes.",
+        button: {
+          color: "#DC2626", // security red
+          text: "Go to Reset Page",
+          link: "https://your-frontend-url.com/reset-password",
+        },
+      },
+
+      outro:
+        "If you did not request a password reset, please ignore this email. Your account remains secure.",
+    },
+  };
+};
+
 export {
   sendEmail,
   emailVerificationMailgenContent,
   otpVerificationMailgenContent,
+  forgotPasswordOtpMailgenContent,
 };

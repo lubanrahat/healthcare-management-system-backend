@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { UserRole, UserStatus } from "../generated/prisma/client/enums";
 import { bearer, emailOTP } from "better-auth/plugins";
-import { otpVerificationMailgenContent, sendEmail } from "../shared/utils/mail";
+import { forgotPasswordOtpMailgenContent, otpVerificationMailgenContent, sendEmail } from "../shared/utils/mail";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -69,6 +69,21 @@ export const auth = betterAuth({
               mailgenContent: otpVerificationMailgenContent(user.name, otp),
             });
 
+          }
+        } else if(type === "forget-password") {
+          const user = await prisma.user.findUnique({
+            where: {
+              email,
+            },
+          });
+
+          if(user) {
+
+            await sendEmail({
+              email: user.email,
+              subject: "Reset your password",
+              mailgenContent: forgotPasswordOtpMailgenContent(user.name, otp),
+            });
           }
         }
         

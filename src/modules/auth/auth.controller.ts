@@ -106,6 +106,43 @@ class AuthController {
       HttpStatus.OK,
     );
   });
+
+  public verifyEmail = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const { email, otp } = req.body;
+    const result = await service.verifyEmail(email, otp);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Email verified successfully",
+      HttpStatus.OK,
+    );
+  });
+
+  public forgotPassword = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const { email } = req.body;
+    const result = await service.forgotPassword(email);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Password reset OTP sent successfully",
+      HttpStatus.OK,
+    );
+
+  });
+
+  public resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const { email, otp, newPassword } = req.body;
+    const result = await service.resetPassword(email, otp, newPassword);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Password reset successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default AuthController;

@@ -220,11 +220,127 @@ class AuthService {
 
   public logoutUser = async (sessionToken: string) => {
     const result = await auth.api.signOut({
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        }
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
+    return result;
+  };
+
+  public verifyEmail = async (email: string, otp: string) => {
+    const result = await auth.api.verifyEmailOTP({
+      body: {
+        email,
+        otp,
+      },
+    });
+
+    if (result.status && !result.user.emailVerified) {
+      await prisma.user.update({
+        where: {
+          email,
+        },
+        data: {
+          emailVerified: true,
+        },
       });
-      return result;
+    }
+
+    return result;
+  };
+
+  public forgotPassword = async (email: string) => {
+    const exgistingUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!exgistingUser) {
+      throw new AppError(
+        "User not found",
+        HttpStatus.NOT_FOUND,
+        ErrorCodes.USER_NOT_FOUND,
+      );
+    }
+
+    if (!exgistingUser.emailVerified) {
+      throw new AppError(
+        "Email not verified. Please verify your email before resetting password",
+        HttpStatus.BAD_REQUEST,
+        ErrorCodes.VALIDATION_ERROR,
+      );
+    }
+
+    if (
+      exgistingUser.isDeleted ||
+      exgistingUser.status === UserStatus.DELETED
+    ) {
+      throw new AppError(
+        "User not found",
+        HttpStatus.NOT_FOUND,
+        ErrorCodes.USER_NOT_FOUND,
+      );
+    }
+
+    await auth.api.requestPasswordResetEmailOTP({
+      body: {
+        email,
+      },
+    });
+  };
+
+  public resetPassword = async (
+    email: string,
+    otp: string,
+    newPassword: string,
+  ) => {
+    const exgistingUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!exgistingUser) {
+      throw new AppError(
+        "User not found",
+        HttpStatus.NOT_FOUND,
+        ErrorCodes.USER_NOT_FOUND,
+      );
+    }
+
+    if (!exgistingUser.emailVerified) {
+      throw new AppError(
+        "Email not verified. Please verify your email before resetting password",
+        HttpStatus.BAD_REQUEST,
+        ErrorCodes.VALIDATION_ERROR,
+      );
+    }
+
+    if (
+      exgistingUser.isDeleted ||
+      exgistingUser.status === UserStatus.DELETED
+    ) {
+      throw new AppError(
+        "User not found",
+        HttpStatus.NOT_FOUND,
+        ErrorCodes.USER_NOT_FOUND,
+      );
+    }
+
+    await auth.api.resetPasswordEmailOTP({
+      body: {
+        email,
+        otp,
+        password: newPassword,
+      },
+    });
+
+    await prisma.session.deleteMany({
+      where: {
+        userId: exgistingUser.id,
+      },
+    });
   };
 }
 
