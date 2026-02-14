@@ -1,33 +1,36 @@
+import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { cloudinaryUpload } from "./cloudinary.config";
-import multer from "multer";
-import type { Request } from "express";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
-  params: async (req: Request, file: Express.Multer.File) => {
-    const originalName = file.originalname.split(".").slice(0, -1).join(".");
-    const extension = file.originalname.split(".").pop()?.toLowerCase() || "";
+  params: async (req, file) => {
+    const originalName = file.originalname;
+    const extension = originalName.split(".").pop()?.toLocaleLowerCase();
+
     const fileNameWithoutExtension = originalName
       .split(".")
       .slice(0, -1)
       .join(".")
       .toLowerCase()
-      .replace(/\s+/g, "_")
-      .replace(/[^a-z0-9_]/g, "");
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9\-]/g, "");
+
     const uniqueName =
-      Math.random().toString(36).substring(2, 8) +
-      "_" +
+      Math.random().toString(36).substring(2) +
+      "-" +
       Date.now() +
-      "_" +
+      "-" +
       fileNameWithoutExtension;
-    const folder = extension === "pdf" ? "documents" : "images";
+
+    const folder = extension === "pdf" ? "pdfs" : "images";
+
     return {
-      folder: `healthcare/${folder}`,
+      folder: `ph-healthcare/${folder}`,
       public_id: uniqueName,
       resource_type: "auto",
     };
   },
 });
 
-export const multerUploder = multer({ storage: storage });
+export const multerUpload = multer({ storage });

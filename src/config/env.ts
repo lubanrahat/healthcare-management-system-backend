@@ -23,9 +23,9 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   FRONTEND_URL: z.string().url(),
-  CLOUDINARY_CLOUD_NAME: z.string(),
-  CLOUDINARY_API_KEY: z.string(),
-  CLOUDINARY_API_SECRET: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -6,6 +6,7 @@ import SpecialtyService from "./specialty.service";
 
 class SpecialtyController {
   public createSpecialty = catchAsync(async (req: Request, res: Response) => {
+    console.log("Received request to create specialty with body:", req.body);
     const service = new SpecialtyService();
     const result = await service.createSpecialty(req.body);
     return ResponseUtil.success(

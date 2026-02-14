@@ -57,6 +57,25 @@ export const errorHandler = (
     );
   }
 
+  // Handle Multer errors
+  if (err instanceof Error && err.message === "Unexpected field") {
+    return ResponseUtil.error(
+      res,
+      "Invalid file field name. Please check the expected field name in the API documentation.",
+      HttpStatus.BAD_REQUEST,
+      ErrorCodes.VALIDATION_ERROR,
+    );
+  }
+
+  if (err instanceof Error && err.message.includes("File too large")) {
+    return ResponseUtil.error(
+      res,
+      "File size exceeds the allowed limit",
+      HttpStatus.BAD_REQUEST,
+      ErrorCodes.VALIDATION_ERROR,
+    );
+  }
+
   // Handle JWT errors
   if (err instanceof Error && err.name === "JsonWebTokenError") {
     return ResponseUtil.error(
@@ -85,7 +104,9 @@ export const errorHandler = (
       ? "Internal server error"
       : err instanceof Error
         ? err.message
-        : "Unknown error";
+        : typeof err === "object" && err !== null && "message" in err
+          ? (err as any).message
+          : "Unknown error";
 
   return ResponseUtil.error(
     res,
