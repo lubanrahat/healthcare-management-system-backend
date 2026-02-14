@@ -4,13 +4,10 @@ import AuthService from "./auth.service";
 import { ResponseUtil } from "../../shared/utils/response.util";
 import HttpStatus from "../../shared/constants/http-status";
 import { logger } from "../../shared/logger/logger";
-import ms, { type StringValue } from "ms";
 import { env } from "../../config/env";
 import TokenService from "../../shared/utils/token";
 import { CookieService } from "../../shared/utils/cookie";
-import { betterAuth } from "better-auth";
 import { auth } from "../../lib/auth";
-import token from "../../shared/utils/token";
 
 class AuthController {
   public registerPatient = catchAsync(async (req: Request, res: Response) => {

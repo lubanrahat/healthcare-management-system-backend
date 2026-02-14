@@ -15,7 +15,6 @@ import type {
   IRegisterPatientPayload,
   SessionResponse,
 } from "./auth.interface";
-import { he, th } from "zod/locales";
 
 class AuthService {
   public registerPatient = async (payload: IRegisterPatientPayload) => {

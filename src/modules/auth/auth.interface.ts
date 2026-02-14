@@ -45,6 +45,3 @@ export interface SessionResponse {
   session: SessionDetails;
   user: User;
 }
-
-// The final type for your constant
-export type Session = SessionResponse | null;

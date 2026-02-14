@@ -7,6 +7,7 @@ const envSchema = z.object({
     .default("development"),
 
   PORT: z.coerce.number().default(8080),
+  DATABASE_URL: z.string(),
   ACCESS_TOKEN_SECRET: z.string(),
   REFRESH_TOKEN_SECRET: z.string(),
   ACCESS_TOKEN_EXPIRATION: z.string(),
@@ -22,6 +23,9 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   FRONTEND_URL: z.string().url(),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_API_SECRET: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
