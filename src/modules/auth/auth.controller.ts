@@ -8,6 +8,9 @@ import ms, { type StringValue } from "ms";
 import { env } from "../../config/env";
 import TokenService from "../../shared/utils/token";
 import { CookieService } from "../../shared/utils/cookie";
+import { betterAuth } from "better-auth";
+import { auth } from "../../lib/auth";
+import token from "../../shared/utils/token";
 
 class AuthController {
   public registerPatient = catchAsync(async (req: Request, res: Response) => {
@@ -129,7 +132,6 @@ class AuthController {
       "Password reset OTP sent successfully",
       HttpStatus.OK,
     );
-
   });
 
   public resetPassword = catchAsync(async (req: Request, res: Response) => {
@@ -142,6 +144,58 @@ class AuthController {
       "Password reset successfully",
       HttpStatus.OK,
     );
+  });
+
+  public googleLogin = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const redirectUrl = (req.query.redirectUrl as string) || "/dashboard";
+    const encodedRedirectPath = encodeURIComponent(redirectUrl);
+    const callbackURL = `${env.BETTER_AUTH_URL}/api/v1/auth/google/success?redirectUrl=${encodedRedirectPath}`;
+
+    res.render("googleRedirect", {
+      callbackURL,
+      betterAuthUrl: env.BETTER_AUTH_URL,
+    });
+  });
+
+  public googleLoginSuccess = catchAsync(
+    async (req: Request, res: Response) => {
+      const service = new AuthService();
+      const redirectUrl = (req.query.redirectUrl as string) || "/dashboard";
+      const sessionToken = req.cookies["better-auth.session_token"];
+
+      if (!sessionToken) {
+        return res.redirect(`${env.FRONTEND_URL}/login?error=oauth_failed`);
+      }
+      const session = await auth.api.getSession({
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      });
+
+      if (!session || !session.user) {
+        return res.redirect(`${env.FRONTEND_URL}/login?error=oauth_failed`);
+      }
+
+      const result = await service.handleGoogleLoginSuccess(session);
+      const { accessToken, refreshToken } = result;
+
+      TokenService.setAccessToken(res, accessToken);
+      TokenService.setRefreshToken(res, refreshToken);
+
+      const isvalidRedirectPath =
+        redirectUrl.startsWith("/") && !redirectUrl.startsWith("//");
+      const finalRedirectUrl = isvalidRedirectPath
+        ? `${env.FRONTEND_URL}${redirectUrl}`
+        : env.FRONTEND_URL;
+      return res.redirect(finalRedirectUrl);
+    },
+  );
+
+  public googleLoginError = catchAsync(async (req: Request, res: Response) => {
+    const service = new AuthService();
+    const error = req.query.error || "oauth_failed";
+    return res.redirect(`${env.FRONTEND_URL}/login?error=${error}`);
   });
 }
 

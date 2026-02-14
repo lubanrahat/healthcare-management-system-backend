@@ -11,9 +11,27 @@ import HttpStatus from "./shared/constants/http-status";
 import { requestIdMiddleware } from "./shared/middlewares/request-id.middleware";
 import { requestLogger } from "./shared/middlewares/request-logger.middleware";
 import { logger } from "./shared/logger/logger";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
+import path from "node:path";
+import cors from "cors";
 
 function createApp(): Application {
   const app: Application = express();
+
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
+
+  app.set("view engine", "ejs");
+  app.set("views", path.resolve(process.cwd(), "src/templates"));
+
+  app.use("/api/auth",toNodeHandler(auth));
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));

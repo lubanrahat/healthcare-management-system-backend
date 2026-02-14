@@ -13,6 +13,7 @@ import type {
   IChangePasswordPayload,
   ILoginPayload,
   IRegisterPatientPayload,
+  SessionResponse,
 } from "./auth.interface";
 import { he, th } from "zod/locales";
 
@@ -352,6 +353,49 @@ class AuthService {
         userId: exgistingUser.id,
       },
     });
+  };
+
+  public handleGoogleLoginSuccess = async (session: SessionResponse) => {
+    const isPatientExist = await prisma.patient.findUnique({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
+    if (!isPatientExist) {
+      await prisma.patient.create({
+        data: {
+          userId: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+        },
+      });
+    }
+
+    const accessToken = TokenService.generateAccessToken({
+      userId: session.user.id,
+      role: session.user.role,
+      name: session.user.name,
+      email: session.user.email,
+      status: session.user.status,
+      isDeleted: session.user.isDeleted,
+      emailVerified: session.user.emailVerified,
+    });
+
+    const refreshToken = TokenService.generateRefreshToken({
+      userId: session.user.id,
+      role: session.user.role,
+      name: session.user.name,
+      email: session.user.email,
+      status: session.user.status,
+      isDeleted: session.user.isDeleted,
+      emailVerified: session.user.emailVerified,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   };
 }
 
