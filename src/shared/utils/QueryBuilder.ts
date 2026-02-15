@@ -45,7 +45,7 @@ export class QueryBuilder<
   search(): this {
     const { searchTerm } = this.queryParams;
     const { searchableFields } = this.config;
-    // doctorSearchableFields = ['user.name', 'user.email', 'specialties.specialty.title' , 'specialties.specialty.description']
+
     if (searchTerm && searchableFields && searchableFields.length > 0) {
       const searchConditions: Record<string, unknown>[] = searchableFields.map(
         (field) => {
@@ -489,15 +489,14 @@ export class QueryBuilder<
     Object.keys(value).forEach((operator) => {
       const operatorValue = value[operator];
 
-      // Skip if operatorValue is undefined
-      if (operatorValue === undefined) {
-        return;
-      }
-
-      const parsedValue: string | number =
+      const parsedValue =
         typeof operatorValue === "string" && !isNaN(Number(operatorValue))
           ? Number(operatorValue)
           : operatorValue;
+
+      if (parsedValue === undefined) {
+        return;
+      }
 
       switch (operator) {
         case "lt":
