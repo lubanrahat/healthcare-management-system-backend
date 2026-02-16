@@ -2,6 +2,14 @@ import { addHours, addMinutes, format } from "date-fns";
 import type { ICreateSchedulePayload } from "./schedule.interface";
 import { prisma } from "../../lib/prisma";
 import { convertDateTime } from "./schedule.utils";
+import { QueryBuilder } from "../../shared/utils/QueryBuilder";
+import type { Prisma, Schedule } from "../../generated/prisma/client/client";
+import {
+  scheduleFilterableFields,
+  scheduleIncludeConfig,
+  scheduleSearchableFields,
+} from "./schedule.constant";
+import type { IQueryParams } from "../../shared/interfaces/query.interface";
 
 class ScheduleService {
   public async createSchedule(payload: ICreateSchedulePayload) {
@@ -68,8 +76,26 @@ class ScheduleService {
     return schedules;
   }
 
-  public getAllSchedules() {
-    // Implementation for retrieving all schedules
+  public async getAllSchedules(query: IQueryParams) {
+    const queryBuilder = new QueryBuilder<
+      Schedule,
+      Prisma.ScheduleWhereInput,
+      Prisma.ScheduleInclude
+    >(prisma.schedule, query, {
+      searchableFields: scheduleSearchableFields,
+      filterableFields: scheduleFilterableFields,
+    });
+
+    const result = await queryBuilder
+      .search()
+      .filter()
+      .paginate()
+      .dynamicInclude(scheduleIncludeConfig)
+      .sort()
+      .fields()
+      .execute();
+
+    return result;
   }
 
   public getScheduleById(id: string) {

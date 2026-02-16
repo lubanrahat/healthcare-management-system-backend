@@ -1,4 +1,5 @@
 import HttpStatus from "../../shared/constants/http-status";
+import type { IQueryParams } from "../../shared/interfaces/query.interface";
 import { catchAsync } from "../../shared/utils/async-handler.util";
 import { ResponseUtil } from "../../shared/utils/response.util";
 import ScheduleService from "./schedule.service";
@@ -17,7 +18,15 @@ class ScheduleController {
   });
 
   public getAllSchedules = catchAsync(async (req, res) => {
-    // Implementation for retrieving all schedules
+    const query = req.query;
+    const schedules = await this.service.getAllSchedules(query as IQueryParams);
+
+    ResponseUtil.success(res, {
+      data: schedules.data,
+      meta: schedules.meta,
+      message: "Schedules retrieved successfully",
+      HttpStatus: HttpStatus.OK,
+    });
   });
 
   public getScheduleById = catchAsync(async (req, res) => {
@@ -32,6 +41,5 @@ class ScheduleController {
     // Implementation for deleting a schedule by its ID
   });
 }
-
 
 export default ScheduleController;
