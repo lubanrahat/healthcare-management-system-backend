@@ -1,5 +1,8 @@
 import { addHours, addMinutes, format } from "date-fns";
-import type { ICreateSchedulePayload } from "./schedule.interface";
+import type {
+  ICreateSchedulePayload,
+  IUpdateSchedulePayload,
+} from "./schedule.interface";
 import { prisma } from "../../lib/prisma";
 import { convertDateTime } from "./schedule.utils";
 import { QueryBuilder } from "../../shared/utils/QueryBuilder";
@@ -98,16 +101,57 @@ class ScheduleService {
     return result;
   }
 
-  public getScheduleById(id: string) {
-    // Implementation for retrieving a schedule by its ID
+  public async getScheduleById(id: string) {
+    const schedule = await prisma.schedule.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return schedule;
   }
 
-  public updateSchedule(id: string) {
-    // Implementation for updating a schedule by its ID
+  public async updateSchedule(id: string, payload: IUpdateSchedulePayload) {
+    const { startDate, endDate, startTime, endTime } = payload;
+    const startDateTime = new Date(
+      addMinutes(
+        addHours(
+          `${format(new Date(startDate), "yyyy-MM-dd")}`,
+          Number(startTime.split(":")[0]),
+        ),
+        Number(startTime.split(":")[1]),
+      ),
+    );
+
+    const endDateTime = new Date(
+      addMinutes(
+        addHours(
+          `${format(new Date(endDate), "yyyy-MM-dd")}`,
+          Number(endTime.split(":")[0]),
+        ),
+        Number(endTime.split(":")[1]),
+      ),
+    );
+
+    const updatedSchedule = await prisma.schedule.update({
+      where: {
+        id: id,
+      },
+      data: {
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+      },
+    });
+
+    return updatedSchedule;
   }
 
-  public deleteSchedule(id: string) {
-    // Implementation for deleting a schedule by its ID
+  public async deleteSchedule(id: string) {
+    await prisma.schedule.delete({
+      where: {
+        id: id,
+      },
+    });
+    return true;
   }
 }
 

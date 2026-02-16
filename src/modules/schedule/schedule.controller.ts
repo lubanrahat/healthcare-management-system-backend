@@ -30,15 +30,40 @@ class ScheduleController {
   });
 
   public getScheduleById = catchAsync(async (req, res) => {
-    // Implementation for retrieving a schedule by its ID
+    const id = req.params.id;
+    const schedule = await this.service.getScheduleById(id as string);
+
+    ResponseUtil.success(res, {
+      data: schedule,
+      message: "Schedule retrieved successfully",
+      HttpStatus: HttpStatus.OK,
+    });
   });
 
   public updateSchedule = catchAsync(async (req, res) => {
-    // Implementation for updating a schedule by its ID
+    const id = req.params.id;
+    const payload = req.body;
+    const updatedSchedule = await this.service.updateSchedule(
+      id as string,
+      payload,
+    );
+
+    ResponseUtil.success(res, {
+      data: updatedSchedule,
+      message: "Schedule updated successfully",
+      HttpStatus: HttpStatus.OK,
+    });
   });
 
   public deleteSchedule = catchAsync(async (req, res) => {
-    // Implementation for deleting a schedule by its ID
+    const id = req.params.id;
+    await this.service.deleteSchedule(id as string);
+
+    ResponseUtil.success(res, {
+      data: null,
+      message: "Schedule deleted successfully",
+      HttpStatus: HttpStatus.NO_CONTENT,
+    });
   });
 }
 
