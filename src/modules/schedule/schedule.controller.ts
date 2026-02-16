@@ -7,7 +7,7 @@ class ScheduleController {
   private service = new ScheduleService();
   public createSchedule = catchAsync(async (req, res) => {
     const payload = req.body;
-    const schedule = await this.service.createSchedule();
+    const schedule = await this.service.createSchedule(payload);
 
     ResponseUtil.success(res, {
       data: schedule,
