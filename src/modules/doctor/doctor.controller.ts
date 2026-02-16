@@ -10,11 +10,13 @@ class DoctorController {
     const service = new DoctorService();
     const query = req.query;
     const result = await service.getAllDoctors(query as IQueryParams);
-    return ResponseUtil.success(
+    return ResponseUtil.paginated(
       res,
-      result,
+      result.data,
+      result.meta.page,
+      result.meta.limit,
+      result.meta.total,
       "Doctors fetched successfully",
-      HttpStatus.OK,
     );
   });
 
