@@ -29,6 +29,9 @@ const envSchema = z.object({
   STRIPE_PUBLIC: z.string().min(1),
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
+  SUPER_ADMIN_EMAIL: z.string().email(),
+  SUPER_ADMIN_PASSWORD: z.string().min(8),
+  SUPER_ADMIN_PASSWORD_CONFIRM: z.string().min(8),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -46,7 +46,7 @@ function createApp(): Application {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  corn.schedule("0 0 * * *", async () => {
+  corn.schedule("*/25 * * * *", async () => {
     try {
       const appointmentService = new AppointmentService();
       await appointmentService.cancelUnpaidAppointments();
