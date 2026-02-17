@@ -16,6 +16,8 @@ import { auth } from "./lib/auth";
 import path from "node:path";
 import cors from "cors";
 import PaymentController from "./modules/payment/payment.controller";
+import corn from "node-cron";
+import AppointmentService from "./modules/appointment/appointment.service";
 
 function createApp(): Application {
   const app: Application = express();
@@ -43,6 +45,16 @@ function createApp(): Application {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  corn.schedule("0 0 * * *", async () => {
+    try {
+      const appointmentService = new AppointmentService();
+      await appointmentService.cancelUnpaidAppointments();
+      logger.info("Scheduled task: Canceled unpaid appointments");
+    } catch (error) {
+      logger.error("Error in scheduled task: Canceled unpaid appointments", error);
+    }
+  });
 
   // Request processing middlewares should come before routes
   app.use(requestIdMiddleware);
