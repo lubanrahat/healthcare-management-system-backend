@@ -15,6 +15,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import path from "node:path";
 import cors from "cors";
+import PaymentController from "./modules/payment/payment.controller";
 
 function createApp(): Application {
   const app: Application = express();
@@ -28,15 +29,20 @@ function createApp(): Application {
     }),
   );
 
+  app.post(
+    "/webhook",
+    express.raw({ type: "application/json" }),
+    PaymentController.handleStripeWebhookEvent,
+  );
+
   app.set("view engine", "ejs");
   app.set("views", path.resolve(process.cwd(), "src/templates"));
 
-  app.use("/api/auth",toNodeHandler(auth));
+  app.use("/api/auth", toNodeHandler(auth));
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
-  
 
   // Request processing middlewares should come before routes
   app.use(requestIdMiddleware);
