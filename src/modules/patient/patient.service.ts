@@ -18,7 +18,7 @@ class PatientService {
       },
       include: {
         patientHealthData: true,
-        medicalReports: true,
+        medicalReports: true, 
       },
     });
 
