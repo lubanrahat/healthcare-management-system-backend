@@ -39,6 +39,23 @@ class ReviewConstant {
       HttpStatus.OK,
     );
   });
+  public updateReview = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const reviewId = req.params.id;
+    const payload = req.body;
+    const service = new ReviewService();
+    const result = await service.updateReview(
+      user,
+      reviewId as string,
+      payload,
+    );
+    return ResponseUtil.success(
+      res,
+      result,
+      "Review updated successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default ReviewConstant;

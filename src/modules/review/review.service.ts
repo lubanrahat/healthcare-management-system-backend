@@ -3,7 +3,10 @@ import { prisma } from "../../lib/prisma";
 import HttpStatus from "../../shared/constants/http-status";
 import AppError from "../../shared/errors/app-error";
 import type { IRequestUser } from "../../shared/interfaces/requestUser.interface";
-import type { ICreateReviewPayload } from "./review.interface";
+import type {
+  ICreateReviewPayload,
+  IUpdateReviewPayload,
+} from "./review.interface";
 
 class ReviewService {
   public giveReview = async (
@@ -138,6 +141,57 @@ class ReviewService {
         },
       });
     }
+  };
+  public updateReview = async (
+    user: IRequestUser,
+    reviewId: string,
+    payload: IUpdateReviewPayload,
+  ) => {
+    const patientData = await prisma.patient.findUniqueOrThrow({
+      where: {
+        email: user?.email,
+      },
+    });
+    const reviewData = await prisma.review.findUniqueOrThrow({
+      where: {
+        id: reviewId,
+      },
+    });
+    if (!(patientData.id === reviewData.patientId)) {
+      throw new AppError("This is not your review!", HttpStatus.BAD_REQUEST);
+    }
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedReview = await tx.review.update({
+        where: {
+          id: reviewId,
+        },
+        data: {
+          ...payload,
+        },
+      });
+
+      const averageRating = await tx.review.aggregate({
+        where: {
+          doctorId: reviewData.doctorId,
+        },
+        _avg: {
+          rating: true,
+        },
+      });
+
+      await tx.doctor.update({
+        where: {
+          id: updatedReview.doctorId,
+        },
+        data: {
+          averageRating: averageRating._avg.rating as number,
+        },
+      });
+
+      return updatedReview;
+    });
+
+    return result;
   };
 }
 
