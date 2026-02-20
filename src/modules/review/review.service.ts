@@ -193,6 +193,50 @@ class ReviewService {
 
     return result;
   };
+  public deleteReview = async (user: IRequestUser, reviewId: string) => {
+    const patientData = await prisma.patient.findUniqueOrThrow({
+      where: {
+        email: user?.email,
+      },
+    });
+    const reviewData = await prisma.review.findUniqueOrThrow({
+      where: {
+        id: reviewId,
+      },
+    });
+    if (!(patientData.id === reviewData.patientId)) {
+      throw new AppError("This is not your review!", HttpStatus.BAD_REQUEST);
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const deletedReview = await tx.review.delete({
+        where: {
+          id: reviewId,
+        },
+      });
+
+      const averageRating = await tx.review.aggregate({
+        where: {
+          doctorId: deletedReview.doctorId,
+        },
+        _avg: {
+          rating: true,
+        },
+      });
+
+      await tx.doctor.update({
+        where: {
+          id: deletedReview.doctorId,
+        },
+        data: {
+          averageRating: averageRating._avg.rating as number,
+        },
+      });
+      return deletedReview;
+    });
+
+    return result;
+  };
 }
 
 export default ReviewService;

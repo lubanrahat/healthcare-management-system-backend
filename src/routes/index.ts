@@ -6,6 +6,8 @@ import registerUsersRoutes from "../modules/user/user.routes";
 import registerDoctorRoutes from "../modules/doctor/doctor.routes";
 import registerAdminRoutes from "../modules/admin/admin.routes";
 import registerScheduleRoutes from "../modules/schedule/schedule.routes";
+import registerReviewRoutes from "../modules/review/review.routes";
+import registerAppointmentRoutes from "../modules/appointment/appointment.routes";
 
 export function registerIndexRoutes(): Router {
   const router = Router();
@@ -17,6 +19,8 @@ export function registerIndexRoutes(): Router {
   router.use("/doctors", registerDoctorRoutes());
   router.use("/admins", registerAdminRoutes());
   router.use("/schedules", registerScheduleRoutes());
+  router.use("/appointments", registerAppointmentRoutes());
+  router.use("/reviews", registerReviewRoutes());
 
   return router;
 }

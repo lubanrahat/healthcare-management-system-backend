@@ -4,7 +4,7 @@ import { withAuth } from "../../shared/middlewares/auth.middleware";
 import { UserRole } from "../../generated/prisma/client/enums";
 import AppointmentController from "./appointment.controller";
 
-export default function registerAuthRoutes(): Router {
+export default function registerAppointmentRoutes(): Router {
   const router = express.Router();
   const controller = new AppointmentController();
 

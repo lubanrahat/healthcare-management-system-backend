@@ -56,6 +56,18 @@ class ReviewConstant {
       HttpStatus.OK,
     );
   });
+  public deleteReview = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    const reviewId = req.params.id;
+    const service = new ReviewService();
+    const result = await service.deleteReview(user, reviewId as string);
+    return ResponseUtil.success(
+      res,
+      result,
+      "Review deleted successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default ReviewConstant;
