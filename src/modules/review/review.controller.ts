@@ -28,6 +28,17 @@ class ReviewConstant {
       HttpStatus.OK,
     );
   });
+  public myReviews = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IRequestUser;
+    const service = new ReviewService();
+    const result = await service.myReviews(user);
+    return ResponseUtil.success(
+      res,
+      result,
+      "My reviews fetched successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default ReviewConstant;

@@ -1,4 +1,4 @@
-import { PaymentStatus } from "../../generated/prisma/client/enums";
+import { PaymentStatus, UserRole } from "../../generated/prisma/client/enums";
 import { prisma } from "../../lib/prisma";
 import HttpStatus from "../../shared/constants/http-status";
 import AppError from "../../shared/errors/app-error";
@@ -91,6 +91,53 @@ class ReviewService {
     });
 
     return reviews;
+  };
+  public myReviews = async (user: IRequestUser) => {
+    const isUserExist = await prisma.user.findUnique({
+      where: {
+        email: user?.email,
+      },
+    });
+    if (!isUserExist) {
+      throw new AppError(
+        "Only patients can view their reviews",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (isUserExist.role === UserRole.DOCTOR) {
+      const doctorData = await prisma.doctor.findUniqueOrThrow({
+        where: {
+          email: user?.email,
+        },
+      });
+      return await prisma.review.findMany({
+        where: {
+          doctorId: doctorData.id,
+        },
+        include: {
+          patient: true,
+          appointment: true,
+        },
+      });
+    }
+
+    if (isUserExist.role === UserRole.PATIENT) {
+      const patientData = await prisma.patient.findUniqueOrThrow({
+        where: {
+          email: user?.email,
+        },
+      });
+      return await prisma.review.findMany({
+        where: {
+          patientId: patientData.id,
+        },
+        include: {
+          doctor: true,
+          appointment: true,
+        },
+      });
+    }
   };
 }
 
