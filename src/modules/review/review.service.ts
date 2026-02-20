@@ -81,6 +81,17 @@ class ReviewService {
 
     return result;
   };
+  public getAllReviews = async () => {
+    const reviews = await prisma.review.findMany({
+      include: {
+        doctor: true,
+        patient: true,
+        appointment: true,
+      },
+    });
+
+    return reviews;
+  };
 }
 
 export default ReviewService;

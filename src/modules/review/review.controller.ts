@@ -18,6 +18,16 @@ class ReviewConstant {
       HttpStatus.CREATED,
     );
   });
+  public getAllReviews = catchAsync(async (req: Request, res: Response) => {
+    const service = new ReviewService();
+    const result = await service.getAllReviews();
+    return ResponseUtil.success(
+      res,
+      result,
+      "Reviews fetched successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default ReviewConstant;
