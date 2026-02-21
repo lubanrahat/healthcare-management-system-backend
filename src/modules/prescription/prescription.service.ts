@@ -1,4 +1,7 @@
-import { uploadFileToCloudinary } from "../../config/cloudinary.config";
+import {
+  deleteFileFromCloudinary,
+  uploadFileToCloudinary,
+} from "../../config/cloudinary.config";
 import { UserRole } from "../../generated/prisma/client/enums";
 import { prisma } from "../../lib/prisma";
 import HttpStatus from "../../shared/constants/http-status";
@@ -200,6 +203,121 @@ class PrescriptionService {
         appointment: true,
       },
     });
+
+    return result;
+  };
+  public updatePrescription = async (
+    user: IRequestUser,
+    prescriptionId: string,
+    payload: any,
+  ) => {
+    const isUserExists = await prisma.user.findUnique({
+      where: {
+        email: user?.email,
+      },
+    });
+
+    if (!isUserExists) {
+      throw new AppError("User not found", HttpStatus.NOT_FOUND);
+    }
+    const prescriptionData = await prisma.prescription.findUniqueOrThrow({
+      where: {
+        id: prescriptionId,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+        appointment: {
+          include: {
+            schedule: true,
+          },
+        },
+      },
+    });
+
+    if (!(user?.email === prescriptionData.doctor.email)) {
+      throw new AppError(
+        "This is not your prescription!",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const updatedInstructions =
+      payload.instructions || prescriptionData.instructions;
+    const updatedFollowUpDate = payload.followUpDate
+      ? new Date(payload.followUpDate)
+      : prescriptionData.followUpDate;
+
+    const pdfBuffer = await generatePrescriptionPDF({
+      doctorName: prescriptionData.doctor.name,
+      doctorEmail: prescriptionData.doctor.email,
+      patientName: prescriptionData.patient.name,
+      patientEmail: prescriptionData.patient.email,
+      appointmentDate: prescriptionData.appointment.schedule.startDateTime,
+      instructions: updatedInstructions,
+      followUpDate: updatedFollowUpDate,
+      prescriptionId: prescriptionData.id,
+      createdAt: prescriptionData.createdAt,
+    });
+
+    const fileName = `prescription-updated-${Date.now()}.pdf`;
+    const uploadedFile = await uploadFileToCloudinary(pdfBuffer, fileName);
+    const newPdfUrl = uploadedFile.secure_url;
+
+    if (prescriptionData.pdfUrl) {
+      try {
+        await deleteFileFromCloudinary(prescriptionData.pdfUrl);
+      } catch (deleteError) {
+        console.error("Failed to delete old PDF from Cloudinary:", deleteError);
+      }
+    }
+
+    const result = await prisma.prescription.update({
+      where: {
+        id: prescriptionId,
+      },
+      data: {
+        instructions: updatedInstructions,
+        followUpDate: updatedFollowUpDate,
+        pdfUrl: newPdfUrl,
+      },
+      include: {
+        patient: true,
+        doctor: true,
+        appointment: {
+          include: {
+            schedule: true,
+          },
+        },
+      },
+    });
+
+    try {
+      await sendEmail({
+        email: result.patient.email,
+        subject: `Your Prescription has been Updated by ${result.doctor.name}`,
+        mailgenContent: prescriptionMailgenContent({
+          patientName: result.patient.name,
+          doctorName: result.doctor.name,
+          specialization: "Healthcare Provider",
+          prescriptionId: result.id,
+          appointmentDate: new Date(
+            result.appointment.schedule.startDateTime,
+          ).toLocaleString(),
+          issuedDate: new Date(result.createdAt).toLocaleDateString(),
+          followUpDate: new Date(result.followUpDate).toLocaleDateString(),
+        }),
+        attachments: [
+          {
+            filename: `Prescription-${result.id}.pdf`,
+            content: pdfBuffer,
+            contentType: "application/pdf",
+          },
+        ],
+      });
+    } catch (emailError) {
+      console.error("Failed to send updated prescription email:", emailError);
+    }
 
     return result;
   };
