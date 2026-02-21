@@ -34,5 +34,16 @@ export default function registerAdminRoutes(): Router {
     controller.deleteAdmin.bind(controller),
   );
 
+  router.patch(
+    "/change-user-status",
+    withAuth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    controller.changeUserStatus,
+  );
+  router.patch(
+    "/change-user-role",
+    withAuth(UserRole.SUPER_ADMIN),
+    controller.changeUserRole,
+  );
+
   return router;
 }

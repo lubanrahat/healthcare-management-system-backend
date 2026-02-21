@@ -48,6 +48,30 @@ class AdminController {
       HttpStatus.OK,
     );
   });
+  public changeUserStatus = catchAsync(async (req: Request, res: Response) => {
+    const service = new AdminService();
+    const user = req.user;
+    const payload = req.body;
+    const result = await service.changeUserStatus(user, payload);
+    return ResponseUtil.success(
+      res,
+      result,
+      "User status changed successfully",
+      HttpStatus.OK,
+    );
+  });
+  public changeUserRole = catchAsync(async (req: Request, res: Response) => {
+    const service = new AdminService();
+    const user = req.user;
+    const payload = req.body;
+    const result = await service.changeUserRole(user, payload);
+    return ResponseUtil.success(
+      res,
+      result,
+      "User role changed successfully",
+      HttpStatus.OK,
+    );
+  });
 }
 
 export default AdminController;

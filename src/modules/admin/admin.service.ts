@@ -4,6 +4,7 @@ import HttpStatus from "../../shared/constants/http-status";
 import AppError from "../../shared/errors/app-error";
 import type { IRequestUser } from "../../shared/interfaces/requestUser.interface";
 import type {
+  IChangeUserRolePayload,
   IChangeUserStatusPayload,
   IUpdateAdminPayload,
 } from "./admin.interface";
@@ -163,6 +164,60 @@ class AdminService {
       },
       data: {
         status: userStatus,
+      },
+    });
+
+    return updatedUser;
+  };
+  public changeUserRole = async (
+    user: IRequestUser,
+    payload: IChangeUserRolePayload,
+  ) => {
+    const isSuperAdminExists = await prisma.admin.findFirstOrThrow({
+      where: {
+        email: user.email,
+        user: {
+          role: UserRole.SUPER_ADMIN,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    const { userId, role } = payload;
+
+    const userToChangeRole = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: userId,
+      },
+    });
+
+    const selfRoleChange = isSuperAdminExists.userId === userId;
+
+    if (selfRoleChange) {
+      throw new AppError(
+        "You cannot change your own role",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (
+      userToChangeRole.role === UserRole.DOCTOR ||
+      userToChangeRole.role === UserRole.PATIENT
+    ) {
+      throw new AppError(
+        "You cannot change the role of doctor or patient user. If you want to change the role of doctor or patient user, you have to delete the user and recreate with new role",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        role,
       },
     });
 
