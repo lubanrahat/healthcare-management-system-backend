@@ -321,6 +321,50 @@ class PrescriptionService {
 
     return result;
   };
+  public deletePrescription = async (
+    user: IRequestUser,
+    prescriptionId: string,
+  ): Promise<void> => {
+    const isUserExists = await prisma.user.findUnique({
+      where: {
+        email: user?.email,
+      },
+    });
+
+    if (!isUserExists) {
+      throw new AppError("User not found", HttpStatus.NOT_FOUND);
+    }
+
+    const prescriptionData = await prisma.prescription.findUniqueOrThrow({
+      where: {
+        id: prescriptionId,
+      },
+      include: {
+        doctor: true,
+      },
+    });
+
+    if (!(user?.email === prescriptionData.doctor.email)) {
+      throw new AppError(
+        "This is not your prescription!",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (prescriptionData.pdfUrl) {
+      try {
+        await deleteFileFromCloudinary(prescriptionData.pdfUrl);
+      } catch (deleteError) {
+        console.error("Failed to delete PDF from Cloudinary:", deleteError);
+      }
+    }
+
+    await prisma.prescription.delete({
+      where: {
+        id: prescriptionId,
+      },
+    });
+  };
 }
 
 export default PrescriptionService;
