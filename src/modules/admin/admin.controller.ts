@@ -15,7 +15,6 @@ class AdminController {
       HttpStatus.OK,
     );
   });
-
   public getAdminById = catchAsync(async (req: Request, res: Response) => {
     const service = new AdminService();
     const result = await service.getAdminById(req.params.id as string);
@@ -26,7 +25,6 @@ class AdminController {
       HttpStatus.OK,
     );
   });
-
   public updateAdmin = catchAsync(async (req: Request, res: Response) => {
     const service = new AdminService();
     const result = await service.updateAdmin(req.params.id as string, req.body);
@@ -37,7 +35,6 @@ class AdminController {
       HttpStatus.OK,
     );
   });
-
   public deleteAdmin = catchAsync(async (req: Request, res: Response) => {
     const service = new AdminService();
     const result = await service.deleteAdmin(
